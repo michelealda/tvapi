@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace TvApi.Infrastructure.Dto
+﻿namespace TvApi.Infrastructure.Dto
 {
     public class TvShowDto
     {
