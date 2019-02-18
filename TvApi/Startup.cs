@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Polly;
-using Polly.Extensions.Http;
-using Polly.Retry;
 using TvApi.Core;
 using TvApi.Infrastructure;
 
@@ -25,15 +20,12 @@ namespace TvApi
 
         public IConfiguration Configuration { get; }
 
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(logger => logger.AddConsole());
 
             services.AddScoped<IShowRepository, ShowRepository>();
             services.AddScoped<ILocalShowProvider, LocalShowProvider>();
-            
-            services.AddHttpClient<IRemoteShowProvider, RemoteShowProvider>()
-                .AddPolicyHandler(RetryOn429TooManyRequests);
 
             services.AddMvc()
                 .AddJsonOptions(options =>
@@ -42,8 +34,8 @@ namespace TvApi
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddHostedService<ShowScraperService>();
+            
+            services.ConfigureScraper();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -55,12 +47,6 @@ namespace TvApi
 
             app.UseMvc();
         }
-
-        private static RetryPolicy<HttpResponseMessage> RetryOn429TooManyRequests
-            => HttpPolicyExtensions
-                .HandleTransientHttpError()
-                .OrResult(response => response.StatusCode == HttpStatusCode.TooManyRequests)
-                .WaitAndRetryForeverAsync(sleepDurationProvider: i => TimeSpan.FromSeconds(5 * i));
-
+        
     }
 }
