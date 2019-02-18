@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TvApi.Core;
 using TvApi.Models;
@@ -10,26 +11,25 @@ namespace TvApi.Controllers
     [ApiController]
     public class ShowsController : ControllerBase
     {
-        private readonly IShowRepository _showRepository;
+        private readonly ILocalShowProvider _localShowProvider;
 
-        public ShowsController(IShowRepository showRepository)
+        public ShowsController(ILocalShowProvider localShowProvider)
         {
-            _showRepository = showRepository;
+            _localShowProvider = localShowProvider;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Show>> Get(int page = 0, int count = 100)
+        public async Task<ActionResult<IEnumerable<Show>>> Get(
+            int page = 0, 
+            int count = 100)
         {
-            var pagedShows = _showRepository
-                .GetAll()
-                .Skip(page * count)
-                .Take(count)
-                .ToList();
+            var shows = await _localShowProvider
+                .GetPagedShows(page, count);
 
-            if (!pagedShows.Any())
+            if (!shows.Any())
                 return NotFound();
 
-            return Ok(pagedShows);
+            return Ok(shows);
         }
     }
 }

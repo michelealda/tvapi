@@ -30,10 +30,9 @@ namespace TvApi
             services.AddLogging(logger => logger.AddConsole());
 
             services.AddScoped<IShowRepository, ShowRepository>();
-
-            // Calls will be delayed for every chunk of 20 shows
-            // this policy will serve as fallback 
-            services.AddHttpClient<IShowProvider, OnlineShowProvider>()
+            services.AddScoped<ILocalShowProvider, LocalShowProvider>();
+            
+            services.AddHttpClient<IRemoteShowProvider, RemoteShowProvider>()
                 .AddPolicyHandler(RetryOn429TooManyRequests);
 
             services.AddMvc()
@@ -44,7 +43,7 @@ namespace TvApi
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHostedService<ShowScraper>();
+            services.AddHostedService<ShowScraperService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

@@ -1,19 +1,18 @@
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Bogus;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
-using TvApi.Controllers;
 using TvApi.Core;
+using TvApi.Infrastructure;
 using TvApi.Models;
 using Xunit;
 
 namespace TvApi.Tests
 {
-    public class ControllerTests
+    public class LocalShowProviderTests
     {
         private readonly Mock<IShowRepository> _repositoryMock;
-        public ControllerTests()
+        public LocalShowProviderTests()
         {
             var castFaker = new Faker<Models.Person>()
                 .RuleFor(o => o.Id, f => f.Random.Int(min: 1))
@@ -30,28 +29,22 @@ namespace TvApi.Tests
         }
 
         [Fact]
-        public void ShowsShouldBePaged()
+        public async Task ShowsShouldBePaged()
         {
             const int itemsPerPage = 5;
-            var result = new ShowsController(_repositoryMock.Object)
-                .Get(0, itemsPerPage).Result as OkObjectResult;
-            
-            result
-                .Should()
-                .NotBeNull();
-
-            (result?.Value as IEnumerable<Show>)
+            (await new LocalShowProvider(_repositoryMock.Object)
+                    .GetPagedShows(0, itemsPerPage))
                 .Should()
                 .HaveCount(itemsPerPage);
         }
 
         [Fact]
-        public void OutOfRangePageShouldReturnNotFound()
+        public async Task OutOfRangePageShouldReturnEmptyList()
         {
-            var result = new ShowsController(_repositoryMock.Object)
-                .Get(10).Result;
-                
-            result.Should().BeAssignableTo<NotFoundResult>();
+            (await new LocalShowProvider(_repositoryMock.Object)
+                    .GetPagedShows(100, 10))
+                .Should()
+                .BeEmpty();
         }
     }
 }

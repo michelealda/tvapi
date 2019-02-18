@@ -13,11 +13,11 @@ using TvApi.Models;
 
 namespace TvApi.Infrastructure
 {
-    public class OnlineShowProvider : IShowProvider
+    public class RemoteShowProvider : IRemoteShowProvider
     {
         private readonly HttpClient _httpClient;
 
-        public OnlineShowProvider(HttpClient httpClient)
+        public RemoteShowProvider(HttpClient httpClient)
         {
             _httpClient = httpClient;
             _httpClient.BaseAddress = new Uri($"http://api.tvmaze.com/");
