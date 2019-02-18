@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using TvApi.Models;
+using TvApi.Tests.Internals;
 using Xunit;
 
 namespace TvApi.Tests

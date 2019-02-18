@@ -4,6 +4,7 @@ using Moq;
 using TvApi.Core;
 using TvApi.Infrastructure;
 using Xunit;
+using Mocks = TvApi.Tests.Internals.Mocks;
 
 namespace TvApi.Tests
 {
@@ -12,7 +13,7 @@ namespace TvApi.Tests
         private readonly Mock<IShowRepository> _repositoryMock;
         public LocalShowProviderTests()
         {
-            _repositoryMock = Fakes.GetShowRepositoryMock();
+            _repositoryMock = Mocks.GetShowRepository();
         }
 
         [Fact]

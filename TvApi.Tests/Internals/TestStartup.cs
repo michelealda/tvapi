@@ -6,7 +6,7 @@ using TvApi.Controllers;
 using TvApi.Core;
 using TvApi.Infrastructure;
 
-namespace TvApi.Tests
+namespace TvApi.Tests.Internals
 {
     public class TestStartup : Startup
     {
@@ -16,7 +16,7 @@ namespace TvApi.Tests
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IShowRepository>(_ => Fakes.GetShowRepositoryMock(200).Object);
+            services.AddScoped<IShowRepository>(_ => Mocks.GetShowRepository(200).Object);
             services.AddScoped<ILocalShowProvider, LocalShowProvider>();
 
             services.AddMvc()
